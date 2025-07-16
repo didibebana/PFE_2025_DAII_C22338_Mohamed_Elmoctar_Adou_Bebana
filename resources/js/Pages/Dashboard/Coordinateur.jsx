@@ -40,6 +40,8 @@ export default function CoordinateurDashboard({
     axesCount,
     sousAxesCount,
     actionsCount,
+    actionsRetard,
+    actionsAVenir,
     budgetTotal,
     budgetConsomme,
     tauxExecutionMoyen,
@@ -69,6 +71,7 @@ export default function CoordinateurDashboard({
                         <Card title="Axes stratégiques" value={(axesCount || 0).toLocaleString('fr-FR')} />
                         <Card title="Sous-Axes" value={(sousAxesCount || 0).toLocaleString('fr-FR')} />
                         <Card title="Actions" value={(actionsCount || 0).toLocaleString('fr-FR')} />
+                        <Card title="Actions en retard ou non démarrées" value={(actionsRetard || 0).toLocaleString('fr-FR')} />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -88,6 +91,22 @@ export default function CoordinateurDashboard({
                             value={`${(tauxExecutionMoyen || 0)}%`}
                         />
                     </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                        <h3 className="text-lg font-semibold mb-4 dark:text-white">📅 Prochaines échéances (30 jours)</h3>
+                        <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-200">
+                            {actionsAVenir.length > 0 ? (
+                                actionsAVenir.map((action, idx) => (
+                                    <li key={idx} className="flex justify-between border-b pb-1 border-gray-200 dark:border-gray-700">
+                                        <span>{action.nom}</span>
+                                        <span className="text-gray-500 text-xs">{action.date}</span>
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="text-gray-500 italic">Aucune action à venir.</li>
+                            )}
+                        </ul>
+                    </div>
+
 
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                         <h3 className="text-lg font-semibold mb-4 dark:text-white">Répartition du budget</h3>

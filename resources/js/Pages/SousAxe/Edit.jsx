@@ -20,6 +20,9 @@ export default function Create({auth, sousaxe, axes}) {
         post(route('sousaxe.update', sousaxe.id));
     }
 
+    const isCoordinateur = auth.user.role.nom === 'coordinateur_axe';
+
+
     return(
 
     <AuthenticatedLayout
@@ -83,7 +86,7 @@ export default function Create({auth, sousaxe, axes}) {
                                 <InputError message={errors.axe_id} className="mt-2" />
                             </div>
                             <div className="mt-4 text-right">
-                                <Link href={route('sousaxe.index')}>
+                            <Link href={isCoordinateur ? route('coordinateur.sousaxe.mesSousAxes') : route('sousaxe.index')}>
                                     <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
                                         Retour
                                     </button>

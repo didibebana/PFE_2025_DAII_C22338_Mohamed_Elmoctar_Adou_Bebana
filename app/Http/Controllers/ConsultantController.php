@@ -68,15 +68,41 @@ class ConsultantController extends Controller
          $tauxExecutionMoyen = count($tauxExecutionGlobal) > 0
              ? round(array_sum($tauxExecutionGlobal) / count($tauxExecutionGlobal), 2)
              : 0;
+        $actions = Action::with(['tauxExecutions', 'budget'])->get();
+
+        // Répartition des statuts
+        $statutCounts = $actions->groupBy('statut')->map->count();
+
+        // Actions en difficulté
+        $actionsEnDifficulte = $actions->filter(function ($action) {
+            $taux = $action->tauxExecutions->avg('taux') ?? 0;
+            $budget = $action->budget?->montant ?? 0;
+            $consomme = $budget * ($taux / 100);
+
+            return $action->statut === 'en retard'
+                || $taux < 25
+                || $consomme > $budget;
+        })->values();
 
          return Inertia::render('Dashboard/Consultant', [
              'axesCount' => $axesCount,
-             'sousAxesCount' => $sousAxesCount,
-             'actionsCount' => $actionsCount,
-             'budgetTotal' => $totalBudget,
-             'budgetConsomme' => $budgetConsomme,
-             'tauxExecutionMoyen' => $tauxExecutionMoyen,
-             'executionParAxe' => $executionParAxe,
+            'sousAxesCount' => $sousAxesCount,
+            'actionsCount' => $actionsCount,
+            'budgetTotal' => $totalBudget,
+            'budgetConsomme' => $budgetConsomme,
+            'tauxExecutionMoyen' => $tauxExecutionMoyen,
+            'executionParAxe' => $executionParAxe,
+            'statutCounts' => $statutCounts,
+            'actionsEnDifficulte' => $actionsEnDifficulte->map(function ($action) {
+                return [
+                    'id' => $action->id,
+                    'nom' => $action->nom,
+                    'statut' => $action->statut,
+                    'taux' => round($action->tauxExecutions->avg('taux') ?? 0, 2),
+                    'budget_total' => $action->budget?->montant ?? 0,
+                    'budget_consomme' => round(($action->budget?->montant ?? 0) * (($action->tauxExecutions->avg('taux') ?? 0) / 100), 2),
+                ];
+            }),
          ]);
     }
 }

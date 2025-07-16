@@ -7,6 +7,7 @@ use App\Http\Requests\StoreAxeRequest;
 use App\Http\Requests\UpdateAxeRequest;
 use App\Http\Resources\AxeResource;
 use App\Http\Resources\SousAxeResource;
+use App\Models\Log;
 use App\Models\SousAxe;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -84,6 +85,13 @@ class AxeController extends Controller
             return redirect()->route('axe.mesAxes', ['coordinateur_id' => $user->id])->with('success', 'Axe ajouté avec succès.');
         }
 
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'create',
+            'entity' => 'axe',
+            'description' => 'Ajout d\'axe : ' . $data['nom'],
+        ]);
+
         return redirect()->route('axe.index')->with('success', 'Axe ajoutée avec succès');
     }
 
@@ -93,7 +101,9 @@ class AxeController extends Controller
     public function show(Request $request,Axe $axe)
     {
         $query = $axe->sousAxes();
-        $axe->load('coordinateur');
+        $axe->load('coordinateur','coordinateur',
+                                'sousAxes.actions.budget',
+                                'sousAxes.actions.tauxExecutions',);
 
         $sortField = request('sort_field', 'created_at');
         $sortDirection = request('sort_direction', 'asc');
@@ -113,7 +123,7 @@ class AxeController extends Controller
         foreach ($axe->sousAxes as $sousAxe) {
             foreach ($sousAxe->actions as $action) {
                 // Budget de l'action
-                $derniereBudget = $action->dernierBudget ;
+                $derniereBudget = $action->budget ;
                 if($derniereBudget){
                     $budget = $derniereBudget->montant;
                     $totalBudget += $budget;
@@ -187,6 +197,12 @@ class AxeController extends Controller
         if ($user->role_id === 2) { // Coordinateur
             return redirect()->route('axe.mesAxes', ['coordinateur_id' => $user->id])->with('success', 'Axe mis à jour avec succès.');
         }
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'update',
+            'entity' => 'axe',
+            'description' => 'Modification de l\'axe : ' . $axe->nom,
+        ]);
 
         return to_route('axe.index')->with('success', "Axe '$axe->nom}' modifiée avec succès");
     }
@@ -203,6 +219,13 @@ class AxeController extends Controller
         if ($user->role_id === 2) { // Coordinateur
             return redirect()->route('axe.mesAxes', ['coordinateur_id' => $user->id])->with('success', "Axe '$nom' supprimé avec succès.");
         }
+
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'delete',
+            'entity' => 'axe',
+            'description' => 'Suppression de l\'axe : ' . $axe->nom,
+        ]);
         return redirect()->route('axe.index')->with('success', "Axe '$nom' supprimée avec succès");
     }
 

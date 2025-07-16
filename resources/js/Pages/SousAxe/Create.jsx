@@ -82,7 +82,7 @@ export default function Create({auth,axes}) {
                                 <InputError message={errors.axe_id} className="mt-2" />
                             </div>
                             <div className="mt-4 text-right">
-                                <Link href={route('axe.index')}>
+                                <Link href={route('sousaxe.index')}>
                                     <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
                                         Retour
                                     </button>

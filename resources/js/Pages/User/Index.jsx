@@ -19,7 +19,7 @@ export default function Index({ auth, users, queryParams = null, success }) {
     }
 
     const deleteUser = (user) => {
-        if(!window.confirm('Etes-vous sûr de vouloir supprimer cet axe ?')) {
+        if(!window.confirm('Etes-vous sûr de vouloir supprimer cet utilisateur ?')) {
             return;
         }
         router.delete(route("user.destroy", user.id))
@@ -113,7 +113,6 @@ export default function Index({ auth, users, queryParams = null, success }) {
                                         <td className="px-3 py-2">{user.email}</td>
                                         <td className="px-3 py-2">{user.role.nom}</td>
                                         <td className="px-3 py-2 text-nowrap">
-                                            <Link href={route('user.show', user.id, false, Ziggy)} className="font-medium text-green-600 dark:text-green-500 hover:underline mr-4">Détails</Link>
                                             <Link href={route('user.edit', user.id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Modifier</Link>
                                             <button onClick={(e) => deleteUser(user)} className="font-medium text-red-600 dark:text-red-500 hover:underline mr-4">Supprimer</button>
                                         </td>

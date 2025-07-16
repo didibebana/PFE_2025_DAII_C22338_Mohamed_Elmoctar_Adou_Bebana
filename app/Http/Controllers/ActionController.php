@@ -7,6 +7,7 @@ use App\Http\Requests\StoreActionRequest;
 use App\Http\Requests\UpdateActionRequest;
 use App\Http\Resources\ActionResource;
 use App\Models\Budget;
+use App\Models\Log;
 use App\Models\SousAxe;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -57,9 +58,20 @@ class ActionController extends Controller
         $responsables = User::whereHas('role', function($query) {
             $query->where('nom', 'responsable_action');
         })->get();
-        $sousaxes = SousAxe::whereHas('axe', function($query) {
-            $query->where('coordinateur_id', Auth::user()->id);
+
+        $user = Auth::user();
+
+    // Récupération des sous-axes selon le rôle de l'utilisateur
+        if ($user->role->nom === 'coordinateur_axe') {
+            // Si coordinateur, récupérer uniquement les sous-axes liés à lui via l'axe
+            $sousaxes = SousAxe::whereHas('axe', function ($query) use ($user) {
+                $query->where('coordinateur_id', $user->id);
         })->get();
+        } else {
+            // Si admin ou autre rôle, récupérer tous les sous-axes
+            $sousaxes = SousAxe::all();
+        }
+
 
 
         return inertia('Action/Create', [
@@ -100,6 +112,14 @@ class ActionController extends Controller
         if ($user->role_id === 2) { // Responsable d'action
             return redirect()->route('action.mesActions', ['responsable_id' => $user->id])->with('success', 'Action ajoutée avec succès.');
         }
+
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'create',
+            'entity' => 'action',
+            'description' => 'Création de l’action : ' . $action->nom,
+        ]);
+
 
         return to_route('action.index')->with('success', 'Action ajoutée avec succès');
     }
@@ -194,8 +214,14 @@ class ActionController extends Controller
 
         $user = Auth::user();
         if ($user->role_id === 3) { // Responsable d'action
-            return redirect()->route('action.mesActions', ['responsable_id' => $user->id])->with('success', 'Action mise à jour avec succès.');
+            return redirect()->route('responsable.action.mesActions', ['responsable_id' => $user->id])->with('success', 'Action mise à jour avec succès.');
         }
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'update',
+            'entity' => 'budget',
+            'description' => 'Modification du budget de l/'.'action  : ' . $action->nom,
+        ]);
 
         return to_route('action.index')->with('success', "Action \'{$action->nom}\' modifiée avec succès");
     }
@@ -212,6 +238,13 @@ class ActionController extends Controller
         if ($user->role_id === 3) { // Responsable d'action
             return redirect()->route('action.mesActions', ['responsable_id' => $user->id])->with('success', "Action '$nom' supprimée avec succès.");
         }
+
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'delete',
+            'entity' => 'action',
+            'description' => 'Suppression d/' . 'action : ' . $action->nom,
+        ]);
 
         return redirect()->route('action.index')->with('success', "Action \'\'{$nom}\'\' supprimée avec succès");
     }

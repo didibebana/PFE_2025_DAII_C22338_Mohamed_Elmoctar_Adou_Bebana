@@ -6,7 +6,7 @@ import TextInput from "@/Components/TextInput";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import {Head, Link, useForm} from "@inertiajs/react";
 
-export default function Create({auth, user, roles}) {
+export default function Edit({auth, user, roles}) {
 
     const {data, setData, post, errors, processing} = useForm({
         nom: user.nom ||'',
@@ -106,7 +106,7 @@ export default function Create({auth, user, roles}) {
                                     <option value="">-- Choisir un role --</option>
                                     {roles.map((role) => (
                                         <option key={role.id} value={role.id}>
-                                             {role.name}
+                                             {role.nom}
                                         </option>
                                     ))}
                                 </SelectInput>

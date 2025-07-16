@@ -8,6 +8,7 @@ use App\Http\Requests\StoreSousAxeRequest;
 use App\Http\Requests\UpdateSousAxeRequest;
 use App\Http\Resources\ActionResource;
 use App\Models\Axe;
+use App\Models\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
 
@@ -23,7 +24,7 @@ class SousAxeController extends Controller
         if ($user->role_id !== 1) {
             abort(403, 'Accès interdit - Administrateur uniquement');
         }
-        
+
         $query = SousAxe::query();
 
         $sortField = request('sort_field', 'created_at');
@@ -66,6 +67,12 @@ class SousAxeController extends Controller
             $axeIds = Axe::where('coordinateur_id', $user->id)->pluck('id');
             return redirect()->route('sousaxe.mesSousAxes', ['axe_ids' => $axeIds])->with('success', 'Sous-Axe ajouté avec succès.');
         }
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'create',
+            'entity' => 'sousaxe',
+            'description' => 'Ajout de sous-axe : ' . $data['nom'],
+        ]);
 
         return redirect()->route('sousaxe.index')->with('success', 'Sous Axe ajoutée avec succès');
     }
@@ -131,6 +138,13 @@ class SousAxeController extends Controller
             return redirect()->route('sousaxe.mesSousAxes', ['axe_ids' => $axeIds])->with('success', 'Sous-Axe mis à jour avec succès.');
         }
 
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'update',
+            'entity' => 'sousaxe',
+            'description' => 'Modification de sous-axe : ' . $sousAxe->nom,
+        ]);
+
         return redirect()->route('sousaxe.index')->with('success', "Sous Axe \'{$sousAxe->nom}\' modifiée avec succès");
     }
 
@@ -148,6 +162,12 @@ class SousAxeController extends Controller
             return redirect()->route('sousaxe.mesSousAxes', ['axe_ids' => $axeIds])->with('success', "Sous-Axe '$nom' supprimé avec succès.");
         }
 
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'delete',
+            'entity' => 'sousaxe',
+            'description' => 'Suppression de sous-axe : ' . $sousAxe->nom,
+        ]);
         return redirect()->route('sousaxe.index')->with('success', "Sous Axe \'\'{$nom}\'\' supprimée avec succès");
     }
 

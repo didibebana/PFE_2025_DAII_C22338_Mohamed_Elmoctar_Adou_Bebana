@@ -44,6 +44,8 @@ export default function CoordinateurDashboard({
     budgetConsomme,
     tauxExecutionMoyen,
     executionParAxe,
+    statutCounts,
+    actionsEnDifficulte,
 }) {
     const budgetData = [
         { name: 'Consommé', value: budgetConsomme },
@@ -88,6 +90,49 @@ export default function CoordinateurDashboard({
                             value={`${(tauxExecutionMoyen || 0)}%`}
                         />
                     </div>
+                        {/* Répartition des statuts */}
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                            <h3 className="text-lg font-semibold mb-4 dark:text-white">Répartition des actions par statut</h3>
+                            <div className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={Object.entries(statutCounts).map(([name, value]) => ({ name, value }))}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={80}
+                                            label
+                                        >
+                                            {Object.keys(statutCounts).map((statut, index) => (
+                                                <Cell key={`cell-${index}`} fill={['#60a5fa', '#34d399', '#facc15', '#f87171'][index % 4]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                        {/* Actions en difficulté */}
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                            <h3 className="text-lg font-semibold mb-4 dark:text-white">⚠️ Actions en difficulté</h3>
+                            {actionsEnDifficulte.length > 0 ? (
+                                <ul className="space-y-2">
+                                    {actionsEnDifficulte.map(action => (
+                                        <li key={action.id} className="border-l-4 border-red-500 pl-4">
+                                            <div className="font-semibold dark:text-white">{action.nom}</div>
+                                            <div className="text-sm text-gray-500">Statut : {action.statut} — Taux : {action.taux}%</div>
+                                            <div className="text-sm text-gray-500">Budget : {action.budget_consomme.toLocaleString('fr-FR')} / {action.budget_total.toLocaleString('fr-FR')} UM</div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-gray-500">Aucune action en difficulté.</p>
+                            )}
+                        </div>
+
+
 
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                         <h3 className="text-lg font-semibold mb-4 dark:text-white">Répartition du budget</h3>

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
+use Illuminate\Auth\Events\Login;
+use App\Listeners\LogSuccessfulLogin;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,6 +19,12 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
+
+    protected $listen = [
+        Login::class => [
+            LogSuccessfulLogin::class,
+        ],
+    ];
 
     /**
      * Bootstrap any application services.

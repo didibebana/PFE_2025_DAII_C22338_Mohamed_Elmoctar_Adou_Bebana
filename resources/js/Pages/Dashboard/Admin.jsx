@@ -45,6 +45,10 @@ export default function Dashboard({
     budgetConsomme,
     tauxExecutionMoyen,
     executionParAxe,
+    usersByRole,
+    actionsCouteuses,
+    actionsEnRetard,
+    logs,
 }) {
     const budgetData = [
         { name: 'Consommé', value: budgetConsomme },
@@ -93,6 +97,52 @@ export default function Dashboard({
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                        <h3 className="text-lg font-semibold mb-4 dark:text-white">Utilisateurs par rôle</h3>
+                        <ul className="space-y-1 text-gray-700 dark:text-gray-300">
+                            {usersByRole.map((role, index) => (
+                                <li key={index}>
+                                    <h4>Le nombre d'utilisateur ont le rôle </h4><strong>{role.role}</strong> : {role.count}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+                        <h3 className="font-semibold text-lg mb-2 dark:text-white">🕒 Historique</h3>
+                        <ul className="text-sm">
+                            {(logs || []).map((log, index) => (
+                                <li key={index}>
+                                    [{new Date(log.created_at).toLocaleString()}] {log.username || log.email} - {log.description}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+                            <h3 className="font-semibold text-lg mb-2 dark:text-white">🔴 Actions en retard</h3>
+                            <ul className="text-sm">
+                                {actionsEnRetard.map(action => (
+                                    <li key={action.id}>
+                                        {action.nom} - <span className="text-red-500">{new Date(action.date_fin).toLocaleDateString()}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+                            <h3 className="font-semibold text-lg mb-2 dark:text-white">💰 Actions les plus coûteuses</h3>
+                            <ul className="text-sm">
+                                {actionsCouteuses.map(action => (
+                                    <li key={action.id}>
+                                        {action.nom} - {(action.budget?.montant || 0).toLocaleString()} UM
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                         <h3 className="text-lg font-semibold mb-4 dark:text-white">Répartition du budget</h3>
                         <div className="h-64">
                             <ResponsiveContainer width="100%" height="100%">
@@ -115,6 +165,7 @@ export default function Dashboard({
                             </ResponsiveContainer>
                         </div>
                     </div>
+
 
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                         <h3 className="text-lg font-semibold mb-4 dark:text-white">Taux d'exécution par axe</h3>

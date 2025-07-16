@@ -14,20 +14,23 @@ class CoordinateurController extends Controller
     {
         $user = Auth::user();
 
-        // Récupérer uniquement les axes où le coordinateur est l'utilisateur connecté
         $axes = Axe::where('coordinateur_id', $user->id)
             ->with(['sousAxes.actions.budget', 'sousAxes.actions.tauxExecutions'])
             ->get();
 
         $axesCount = $axes->count();
         $sousAxesCount = $axes->pluck('sousAxes')->flatten()->count();
-        $actionsCount = $axes->pluck('sousAxes')->flatten()->pluck('actions')->flatten()->count();
+        $actions = $axes->pluck('sousAxes')->flatten()->pluck('actions')->flatten();
+
+        $actionsCount = $actions->count();
 
         $totalBudget = 0;
         $budgetConsomme = 0;
         $tauxExecutionGlobal = [];
+        $actionsRetard = 0;
+        $actionsAVenir = [];
 
-        $executionParAxe = $axes->map(function ($axe) use (&$budgetConsomme, &$totalBudget, &$tauxExecutionGlobal) {
+        $executionParAxe = $axes->map(function ($axe) use (&$budgetConsomme, &$totalBudget, &$tauxExecutionGlobal, &$actionsRetard, &$actionsAVenir) {
             $tauxAxe = [];
             $totalBudgetAxe = 0;
             $totalConsommeAxe = 0;
@@ -43,6 +46,19 @@ class CoordinateurController extends Controller
 
                     $tauxAxe[] = $taux;
                     $tauxExecutionGlobal[] = $taux;
+
+                    // Actions en retard ou non démarrées
+                    if ($taux === 0 && $action->date_echeance < now()) {
+                        $actionsRetard++;
+                    }
+
+                    // Actions à venir (dans les 30 prochains jours)
+                    if ($action->date_echeance >= now() && $action->date_echeance <= now()->addDays(30)) {
+                        $actionsAVenir[] = [
+                            'nom' => $action->nom,
+                            'date' => $action->date_echeance->format('Y-m-d'),
+                        ];
+                    }
                 }
             }
 
@@ -71,6 +87,9 @@ class CoordinateurController extends Controller
             'budgetConsomme' => $budgetConsomme,
             'tauxExecutionMoyen' => $tauxExecutionMoyen,
             'executionParAxe' => $executionParAxe,
+            'actionsRetard' => $actionsRetard,
+            'actionsAVenir' => $actionsAVenir,
         ]);
     }
+
 }

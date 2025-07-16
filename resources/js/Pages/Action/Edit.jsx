@@ -25,6 +25,11 @@ export default function Create({auth, action, sousaxes, responsables, taux_execu
         post(route('action.update', action.id));
     }
 
+    const isAdmin = auth.user.role.nom === 'administrateur';
+
+    const isResponsable = auth.user.role.nom === 'responsable_action';
+
+
     return(
 
     <AuthenticatedLayout
@@ -116,7 +121,8 @@ export default function Create({auth, action, sousaxes, responsables, taux_execu
                                 />
                                 <InputError message={errors.date_fin} className="mt-2" />
                             </div>
-                            <div>
+                            {isAdmin &&(<>
+                                <div>
                             <InputLabel htmlFor="sous_axe_id" value="Sous Axe lié" />
                             <SelectInput
                                 id="sous_axe_id"
@@ -152,6 +158,8 @@ export default function Create({auth, action, sousaxes, responsables, taux_execu
                                 </SelectInput>
                                 <InputError message={errors.responsable_id} className="mt-2" />
                             </div>
+                            </>)}
+
                             <div>
                                 <label className="block font-medium text-sm text-gray-700">Taux d'exécution (%)</label>
                                 <TextInput
@@ -166,7 +174,7 @@ export default function Create({auth, action, sousaxes, responsables, taux_execu
                                 <InputError message={errors.taux} className="mt-2" />
                             </div>
                             <div className="mt-4 text-right">
-                                <Link href={route('action.index')}>
+                                <Link href={isResponsable ? route('responsable.action.mesActions') : route('action.index')}>
                                     <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
                                         Retour
                                     </button>

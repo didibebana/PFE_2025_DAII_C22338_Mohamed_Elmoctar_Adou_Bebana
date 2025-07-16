@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
-    ResponsiveContainer, PieChart, Pie, Cell
+    ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line,
 } from 'recharts';
 
 const Card = ({ title, value, className = '' }) => (
@@ -37,13 +37,14 @@ const BudgetProgress = ({ consumed, total }) => {
 
 export default function CoordinateurDashboard({
     auth,
-    axesCount,
-    sousAxesCount,
     actionsCount,
     budgetTotal,
     budgetConsomme,
     tauxExecutionMoyen,
     executionParAxe,
+    evolution,
+    echeances = [],
+    difficiles = [],
 }) {
     const budgetData = [
         { name: 'Consommé', value: budgetConsomme },
@@ -85,6 +86,52 @@ export default function CoordinateurDashboard({
                             title="Taux d'exécution moyen"
                             value={`${(tauxExecutionMoyen || 0)}%`}
                         />
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                        <h3 className="text-lg font-semibold mb-4 dark:text-white">Évolution du taux d'exécution</h3>
+                        <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={evolution}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="mois" />
+                                    <YAxis domain={[0, 100]} />
+                                    <Tooltip formatter={(value) => `${value}%`} />
+                                    <Line type="monotone" dataKey="taux" stroke="#10B981" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                            <h3 className="text-lg font-semibold mb-2 dark:text-white">📅 Échéances imminentes</h3>
+                            <ul className="text-sm text-gray-600 dark:text-gray-300">
+                                {echeances.length > 0 ? (
+                                    echeances.map((e, idx) => (
+                                        <li key={idx}>
+                                            <strong>{e.nom}</strong> (fin : {e.fin}) - Axe : {e.axe}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li>Aucune action à échéance proche</li>
+                                )}
+                            </ul>
+                        </div>
+
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                            <h3 className="text-lg font-semibold mb-2 dark:text-white">⚠️ Actions en retard</h3>
+                            <ul className="text-sm text-gray-600 dark:text-gray-300">
+                                {difficiles.length > 0 ? (
+                                    difficiles.map((a, idx) => (
+                                        <li key={idx}>
+                                            <strong>{a.nom}</strong> - Axe : {a.axe} - Taux : {a.taux}% - Fin : {a.fin}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li>Aucune action en retard</li>
+                                )}
+                            </ul>
+                        </div>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">

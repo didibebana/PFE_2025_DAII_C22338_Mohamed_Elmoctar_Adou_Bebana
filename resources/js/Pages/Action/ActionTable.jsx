@@ -109,8 +109,8 @@ export default function ActionTable({ actions, queryParams = null }) {
                                         </td>
                                         <td className="px-3 py-2 text-nowrap">
                                             <Link href={route('action.show', action.id, false, Ziggy)} className="font-medium text-green-600 dark:text-green-500 hover:underline mr-4">Détails</Link>
-                                           {(isAdmin || isResponsable) && (<> <Link href={route('action.edit', action.id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Modifier</Link>
-                                            <button onClick={(e) => deleteAction(action)} className="font-medium text-red-600 dark:text-red-500 hover:underline mr-4">Supprimer</button> </> )}
+                                           {(isAdmin || isResponsable) && (<> <Link href={route('action.edit', action.id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Modifier</Link></>)}
+                                           {(isAdmin || isCoordinateur) && (<> <button onClick={(e) => deleteAction(action)} className="font-medium text-red-600 dark:text-red-500 hover:underline mr-4">Supprimer</button> </> )}
                                         </td>
                                     </tr>
                                 ))}

@@ -108,10 +108,10 @@ export default function Index({ auth, axes, queryParams = null, success }) {
                                         <td className="px-3 py-2">{axe.nom}</td>
                                         <td className="px-3 py-2 text-nowrap">
                                             <Link href={route('axe.show', axe.id, false, Ziggy)} className="font-medium text-green-600 dark:text-green-500 hover:underline mr-4">Détails</Link>
-                                           {(isAdmin || isCoordinateur) && (<>
-                                            <Link href={route('axe.edit', axe.id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Modifier</Link>
-                                            <button onClick={(e) => deleteAxe(axe)} className="font-medium text-red-600 dark:text-red-500 hover:underline mr-4">Supprimer</button>
-                                           </>)}
+                                           {(isAdmin) && (<>
+                                            <Link href={route('axe.edit', axe.id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Modifier</Link></>)}
+                                           {(isAdmin) && ( <><button onClick={(e) => deleteAxe(axe)} className="font-medium text-red-600 dark:text-red-500 hover:underline mr-4">Supprimer</button></>)}
+
                                         </td>
                                     </tr>
                                 ))}

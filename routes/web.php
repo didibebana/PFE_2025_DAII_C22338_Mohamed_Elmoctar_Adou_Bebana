@@ -36,18 +36,18 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/coordinateur', [CoordinateurController::class, 'index'])->name('dashboard.coordinateur');
     // Routes spécifiques à ce rôle
-    Route::get('/mes-axes', [AxeController::class, 'mesAxes'])->name('coordinateur.axe.mesAxes');
-    Route::get('/mes-sous-axes', [SousAxeController::class, 'mesSousAxes'])->name('coordinateur.sousaxe.mesSousAxes');
-    Route::get('/mes-actions', [ActionController::class, 'mesActions'])->name('coordinateur.action.mesActions');
+    Route::get('/mes-axes-coordinateur', [AxeController::class, 'mesAxes'])->name('coordinateur.axe.mesAxes');
+    Route::get('/mes-sous-axes-coordinateur', [SousAxeController::class, 'mesSousAxes'])->name('coordinateur.sousaxe.mesSousAxes');
+    Route::get('/mes-actions-coordinateur', [ActionController::class, 'mesActions'])->name('coordinateur.action.mesActions');
 });
 
 // Responsable d'action
 Route::middleware(['auth'])->group(function () {
     Route::get('/responsable', [ResponsableController::class, 'index'])->name('dashboard.responsable');
     // Routes spécifiques à ce rôle
-    Route::get('/mes-axe', [AxeController::class, 'mesAxes'])->name('responsable.axe.mesAxes');
-    Route::get('/mes-sous-axe', [SousAxeController::class, 'mesSousAxes'])->name('responsable.sousaxe.mesSousAxes');
-    Route::get('/mes-action', [ActionController::class, 'mesActions'])->name('responsable.action.mesActions');
+    Route::get('/mes-axe-responsable', [AxeController::class, 'mesAxes'])->name('responsable.axe.mesAxes');
+    Route::get('/mes-sous-axe-responsable', [SousAxeController::class, 'mesSousAxes'])->name('responsable.sousaxe.mesSousAxes');
+    Route::get('/mes-action-responsable', [ActionController::class, 'mesActions'])->name('responsable.action.mesActions');
 });
 
 
@@ -55,9 +55,9 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/consultant', [ConsultantController::class, 'index'])->name('dashboard.consultant');
     // Routes spécifiques à ce rôle
-    Route::get('/mes-axe', [AxeController::class, 'mesAxes'])->name('consultant.axe');
-    Route::get('/mes-sous-axe', [SousAxeController::class, 'mesSousAxes'])->name('consultant.sousaxe');
-    Route::get('/mes-action', [ActionController::class, 'mesActions'])->name('consultant.action');
+    Route::get('/mes-axe-consultant', [AxeController::class, 'mesAxes'])->name('consultant.axe');
+    Route::get('/mes-sous-axe-consultant', [SousAxeController::class, 'mesSousAxes'])->name('consultant.sousaxe');
+    Route::get('/mes-action-consultant', [ActionController::class, 'mesActions'])->name('consultant.action');
 });
 
 

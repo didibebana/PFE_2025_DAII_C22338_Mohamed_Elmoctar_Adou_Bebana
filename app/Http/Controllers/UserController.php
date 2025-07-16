@@ -95,7 +95,7 @@ class UserController extends Controller
     {
         return inertia('User/Edit', [
             'user' => new UserResource($user),
-            'role' => Role::all('id','name'),
+            'roles' => Role::all('id','nom'),
         ]);
     }
 
@@ -112,13 +112,12 @@ class UserController extends Controller
         }else {
             unset($data['password']);
         }
-        $user->update($data);
-
-        // Supprimer tous les rôles actuels de l'utilisateur
-        $user->removeRole($user->roles->first()); // Supprimer l'actuel rôle
-
-        // Assigner le nouveau rôle sélectionné
-        $user->assignRole(Role::find($data['role'])->name);
+        $user->update([
+            'nom' => $data['nom'],
+            'email' => $data['email'],
+            'password' => $data['password'] ?? $user->password,
+            'role_id' => $data['role'],
+        ]);
         return to_route('user.index')->with('success', "Utilisateur \'{$user->nom}\' modifiée avec succès");
     }
 

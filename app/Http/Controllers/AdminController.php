@@ -9,6 +9,7 @@ use App\Models\SousAxe;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class AdminController extends Controller
@@ -21,6 +22,18 @@ class AdminController extends Controller
          $sousAxesCount = SousAxe::count();
          $actionsCount = Action::count();
          $usersCount = User::count();
+
+         $usersByRole = User::selectRaw('role_id, COUNT(*) as count')
+            ->groupBy('role_id')
+            ->with('role') // si tu as une relation `role()` dans User
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'role' => $item->role->nom ?? 'Inconnu',
+                    'count' => $item->count
+                ];
+            });
+
 
          // Récupérer tous les budgets avec leurs actions
          $budgets = Budget::with('action')->get();
@@ -66,10 +79,31 @@ class AdminController extends Controller
                  ];
              });
 
+             $actionsEnRetard = Action::where('date_fin', '<', now())
+                ->orderBy('date_fin')
+                ->take(5)
+                ->get(['id', 'nom', 'date_fin']);
+
+            $actionsCouteuses = Action::with('budget')
+                ->get()
+                ->sortByDesc(fn($action) => $action->budget->montant ?? 0)
+                ->take(5)
+                ->values();
+
+
          // Calcul du taux d'exécution moyen global
          $tauxExecutionMoyen = count($tauxExecutionGlobal) > 0
              ? round(array_sum($tauxExecutionGlobal) / count($tauxExecutionGlobal), 2)
              : 0;
+
+            $logs = DB::table('logs')
+                ->join('users', 'logs.user_id', '=', 'users.id')
+                ->select('logs.*', 'users.nom as username', 'users.email')
+                ->orderByDesc('logs.created_at')
+                ->take(10)
+                ->get();
+
+
 
          return Inertia::render('Dashboard/Admin', [
              'axesCount' => $axesCount,
@@ -80,6 +114,10 @@ class AdminController extends Controller
              'budgetConsomme' => $budgetConsomme,
              'tauxExecutionMoyen' => $tauxExecutionMoyen,
              'executionParAxe' => $executionParAxe,
+             'usersByRole' => $usersByRole,
+             'actionsEnRetard' => $actionsEnRetard,
+             'actionsCouteuses' => $actionsCouteuses,
+             'logs' => $logs
          ]);
     }
 }
